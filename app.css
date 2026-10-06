@@ -1,0 +1,487 @@
+/* Темна тема з червоним акцентом. Колір свій, а не з теми Telegram: каталог
+   має виглядати однаково в усіх клієнтів, інакше на світлій темі фото на
+   білому тлі зливаються з підкладкою.
+
+   Розкладка йде від телефона. Ширші екрани не розтягують ту саму колонку,
+   а додають колонки: на планшеті дві, на ноутбуці три-чотири. Смуга вкладок
+   на широкому екрані переїжджає нагору - внизу вона там недосяжна для ока. */
+:root{
+  --bg:#000;
+  --surface:#131315;
+  --surface-2:#1d1d20;
+  --line:#26262a;
+  --text:#fff;
+  --muted:#8b8b93;
+  --muted-2:#5f5f68;
+  --accent:#f5232b;
+  --accent-soft:rgba(245,35,43,.18);
+  --r:18px;
+  --pad:16px;
+  --tabbar-h:64px;
+  --shell:1180px;
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --safe-t:env(safe-area-inset-top,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text)}
+body{
+  font:400 15px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,system-ui,sans-serif;
+  overscroll-behavior-y:none;
+}
+button,input,textarea{font:inherit;color:inherit}
+button{background:none;border:0;padding:0;cursor:pointer}
+svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.9;
+    stroke-linecap:round;stroke-linejoin:round}
+[hidden]{display:none!important}
+
+/* ── каркас ─────────────────────────────────────────────────────────── */
+.screen{
+  min-height:100vh;
+  padding:calc(var(--safe-t) + 6px) 0 calc(var(--tabbar-h) + var(--safe-b) + 28px);
+  animation:fade .22s ease both;
+}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.shell{max-width:var(--shell);margin:0 auto}
+.shell.narrow{max-width:640px}
+
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;padding:10px var(--pad) 14px;
+}
+.topbar-actions{display:flex;gap:8px;flex:none}
+.brand{display:flex;align-items:center;gap:9px;min-width:0;
+  background:none;border:0;padding:0;color:inherit;text-align:left;
+  transition:transform .12s}
+.brand:active{transform:scale(.97)}
+.mark{width:22px;height:22px;flex:none;fill:var(--accent);stroke:none}
+.brand-name{font-size:19px;font-weight:800;letter-spacing:-.02em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.icon-btn{
+  width:34px;height:34px;flex:none;border-radius:50%;
+  background:var(--surface-2);color:var(--text);padding:9px;
+  transition:transform .12s,background .15s;
+}
+.icon-btn:active{transform:scale(.92);background:var(--line)}
+.lang-btn{padding:0;font-size:12px;font-weight:800;letter-spacing:.04em}
+
+/* ── сегменти ───────────────────────────────────────────────────────── */
+.segments{
+  display:flex;gap:8px;padding:0 var(--pad) 14px;
+  overflow-x:auto;scrollbar-width:none;
+}
+.segments::-webkit-scrollbar{display:none}
+.seg{
+  flex:none;padding:10px 20px;border-radius:999px;
+  background:var(--surface-2);color:var(--muted);
+  font-weight:600;font-size:14px;white-space:nowrap;
+  transition:background .16s,color .16s,transform .12s;
+}
+.seg:active{transform:scale(.96)}
+.seg.is-active{background:var(--accent);color:#fff;box-shadow:0 6px 18px -6px var(--accent)}
+
+/* Нижній вартовий стрічки: поки він не на екрані, решту карток не
+   малюємо. Висота потрібна, щоб спостерігач його взагалі побачив. */
+.feed-more{height:40px}
+
+.boot-error{
+  margin:0 var(--pad) 14px;padding:12px 15px;border-radius:14px;
+  background:var(--accent-soft);color:#ff6b70;font-size:13px;line-height:1.45;
+}
+
+/* Найперший рядок: розділ. Меблі й авто - це різні світи, а не різні
+   фільтри, тому вибір виглядає вагоміше за все інше на екрані. */
+.muted-line{color:var(--muted-2);font-size:13px;margin-top:6px}
+
+.sections{display:flex;gap:8px;padding:0 var(--pad) 12px}
+
+/* Гортання фото в стрічці. Половинки картки навмисно невидимі: вони
+   потрібні пальцю, а не оку - картку не можна перетворювати на пульт. */
+.card-nav{
+  position:absolute;top:0;bottom:0;width:34%;
+  background:none;border:0;padding:0;z-index:2;
+}
+.card-nav-left{left:0}
+.card-nav-right{right:0}
+.card-dots{
+  position:absolute;left:0;right:0;bottom:9px;z-index:2;
+  display:flex;justify-content:center;gap:5px;pointer-events:none;
+}
+.card-dots i{
+  width:5px;height:5px;border-radius:50%;
+  background:rgba(255,255,255,.45);transition:background .15s,transform .15s;
+}
+.card-dots i.is-on{background:#fff;transform:scale(1.25)}
+
+/* Кнопка зв'язку: значок Telegram поруч із ніком. Людина бачить, куди
+   потрапить, ще до натискання. */
+.wide-btn{display:flex;align-items:center;justify-content:center;gap:9px}
+.tg-mark{width:17px;height:17px;flex:none;fill:currentColor;stroke:none}
+.sec{
+  flex:1;padding:11px 14px;border-radius:14px;
+  background:var(--surface-2);color:var(--muted);
+  font-weight:700;font-size:14px;white-space:nowrap;
+  transition:background .16s,color .16s,transform .12s;
+}
+.sec:active{transform:scale(.97)}
+.sec.is-active{background:var(--accent);color:#fff;box-shadow:0 6px 18px -6px var(--accent)}
+
+/* Верхній рядок: місто. Виглядає тихіше за групи - це не те, що людина
+   перемикає щохвилини, а відповідь на питання "де я купую". */
+.segments.cities{padding-bottom:12px}
+.segments.cities .seg{
+  padding:7px 14px;font-size:13px;
+  background:transparent;color:var(--muted-2);
+  box-shadow:inset 0 0 0 1px var(--line);
+}
+.segments.cities .seg.is-active{
+  background:var(--surface-2);color:var(--text);
+  box-shadow:inset 0 0 0 1px var(--muted-2);
+}
+
+/* Другий рядок: категорії всередині обраної групи. Зі ста товарами
+   шукати потрібне через аркуш фільтрів задовго. */
+.segments.sub{padding-bottom:16px}
+.segments.sub .seg{
+  padding:7px 15px;font-size:13px;font-weight:600;
+  background:transparent;color:var(--muted-2);
+  box-shadow:inset 0 0 0 1px var(--line);
+}
+.segments.sub .seg.is-active{
+  background:var(--accent-soft);color:#ff6b70;
+  box-shadow:inset 0 0 0 1px rgba(245,35,43,.42);
+}
+
+.filter-bar{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin:0 var(--pad) 14px;padding:11px 15px;
+  background:var(--surface);border-radius:14px;
+  color:var(--muted);font-size:13px;
+}
+.filter-bar button{color:var(--accent);font-size:13px;font-weight:700}
+
+/* ── стрічка ────────────────────────────────────────────────────────── */
+.feed{
+  display:grid;grid-template-columns:1fr;gap:26px;
+  padding:0 var(--pad);align-items:start;
+}
+.card{animation:fade .25s ease both;min-width:0}
+.card-media{
+  position:relative;border-radius:var(--r);overflow:hidden;
+  background:var(--surface);aspect-ratio:4/3;
+}
+.card-media img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  opacity:0;transition:opacity .35s ease;
+}
+.card-media img.is-ready{opacity:1}
+.card-media.is-empty::after{
+  content:attr(data-empty);position:absolute;inset:0;display:grid;place-items:center;
+  color:var(--muted-2);font-size:13px;
+}
+.pill{
+  position:absolute;display:flex;align-items:center;gap:5px;
+  padding:6px 11px;border-radius:999px;font-size:12px;font-weight:600;
+  background:rgba(0,0,0,.62);backdrop-filter:blur(10px);
+}
+.pill-count{left:10px;bottom:10px}
+.pill-new{left:10px;top:10px;background:var(--accent)}
+.fav-btn{
+  position:absolute;right:10px;top:10px;width:32px;height:32px;padding:7px;
+  border-radius:50%;background:rgba(0,0,0,.55);backdrop-filter:blur(10px);
+  color:#fff;transition:transform .14s,color .16s;
+}
+.fav-btn:active{transform:scale(.85)}
+.fav-btn.is-on{color:var(--accent)}
+.fav-btn.is-on svg{fill:var(--accent)}
+
+.card-body{padding:11px 2px 0}
+.card-title{
+  font-size:16px;font-weight:700;letter-spacing:-.01em;margin:0 0 5px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.card-price{font-size:21px;font-weight:800;letter-spacing:-.02em;margin-bottom:5px}
+.card-meta{color:var(--muted);font-size:13px}
+
+/* ── скелетони ──────────────────────────────────────────────────────── */
+.sk{background:var(--surface);border-radius:var(--r);position:relative;overflow:hidden}
+.sk::after{
+  content:"";position:absolute;inset:0;transform:translateX(-100%);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.05),transparent);
+  animation:shimmer 1.3s infinite;
+}
+@keyframes shimmer{to{transform:translateX(100%)}}
+.sk-media{aspect-ratio:4/3}
+.sk-line{height:13px;border-radius:6px;margin-top:10px}
+
+.empty{padding:70px 34px;text-align:center;color:var(--muted);animation:fade .25s both}
+.empty b{display:block;color:var(--text);font-size:17px;margin-bottom:7px}
+
+/* ── товар ──────────────────────────────────────────────────────────── */
+.detail{padding-top:0;padding-bottom:0}
+.detail-shell{max-width:var(--shell);margin:0 auto}
+.detail-media{position:relative}
+.gallery{
+  display:flex;overflow-x:auto;scroll-snap-type:x mandatory;
+  scrollbar-width:none;background:var(--surface);aspect-ratio:1/1;
+}
+.gallery::-webkit-scrollbar{display:none}
+.gallery img{width:100%;height:100%;flex:none;object-fit:cover;scroll-snap-align:center}
+.gallery-count{
+  position:absolute;right:var(--pad);bottom:12px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(0,0,0,.62);backdrop-filter:blur(10px);
+  font-size:12px;font-weight:600;z-index:2;
+}
+.back-btn,.detail-actions{position:absolute;top:calc(var(--safe-t) + 12px);z-index:3}
+.back-btn{
+  left:var(--pad);width:36px;height:36px;padding:8px;border-radius:50%;
+  background:rgba(0,0,0,.55);backdrop-filter:blur(10px);color:#fff;
+  transition:transform .14s;
+}
+.back-btn:active{transform:scale(.88)}
+.detail-actions{right:var(--pad);display:flex;gap:8px}
+.detail-actions .fav-btn{position:static}
+
+.detail-body{padding:20px var(--pad) 0}
+.detail-body h1{font-size:23px;font-weight:800;letter-spacing:-.02em;margin:0 0 10px;line-height:1.24}
+.detail-price{font-size:30px;font-weight:800;letter-spacing:-.025em;margin-bottom:8px}
+.detail-meta{color:var(--muted);font-size:13px;margin-bottom:20px}
+.specs{display:grid;gap:1px;background:var(--line);border-radius:14px;overflow:hidden;margin-bottom:18px}
+.spec{display:flex;justify-content:space-between;gap:14px;
+  padding:13px 15px;background:var(--surface);font-size:14px}
+.spec span:first-child{color:var(--muted)}
+.spec span:last-child{font-weight:600;text-align:right}
+.detail-desc{color:#d6d6da;font-size:15px;line-height:1.6;margin:0 0 18px;white-space:pre-line}
+.note{padding:13px 15px;border-radius:14px;background:var(--surface);
+  color:var(--muted);font-size:14px;margin-bottom:20px}
+/* Схожі товари: якщо саме цей диван не підійшов, покупець одразу бачить
+   інші, а не повертається в стрічку шукати заново. */
+.similar{margin-bottom:22px}
+.similar h2{font-size:16px;font-weight:700;letter-spacing:-.01em;margin:0 0 12px}
+.similar-row{
+  display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;
+  padding-bottom:4px;margin:0 calc(-1 * var(--pad));padding-left:var(--pad);
+  padding-right:var(--pad);
+}
+.similar-row::-webkit-scrollbar{display:none}
+.similar-card{flex:0 0 132px;min-width:0;text-align:left}
+.similar-card .thumb{
+  width:132px;height:99px;border-radius:12px;object-fit:cover;
+  background:var(--surface);display:block;
+}
+.similar-card .name{
+  font-size:13px;font-weight:600;margin-top:7px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.similar-card .cost{font-size:14px;font-weight:800;margin-top:3px}
+
+.detail-cta{position:sticky;bottom:0;padding:12px var(--pad) calc(12px + var(--safe-b));
+  background:linear-gradient(to top,var(--bg) 62%,transparent)}
+
+.wide-btn{
+  display:block;width:100%;padding:16px;border-radius:15px;
+  background:var(--accent);color:#fff;font-size:16px;font-weight:700;
+  box-shadow:0 10px 30px -10px var(--accent);
+  transition:transform .12s,opacity .15s;
+}
+.wide-btn:active{transform:scale(.98);opacity:.92}
+.wide-btn:disabled{background:var(--surface-2);color:var(--muted-2);box-shadow:none}
+.ghost-btn{display:block;width:100%;padding:13px;margin-top:8px;
+  color:var(--muted);font-size:14px;font-weight:600}
+
+/* ── інфо і форми ───────────────────────────────────────────────────── */
+.info{padding:4px var(--pad);display:flex;flex-direction:column;gap:12px}
+.info-card{background:var(--surface);border-radius:16px;padding:16px 17px}
+.info-card h3{margin:0 0 6px;font-size:15px;font-weight:700}
+.info-card p{margin:0;color:var(--muted);font-size:14px;line-height:1.55}
+.info-card p.spaced{margin-top:8px}
+.info-card.muted p{color:var(--muted-2)}
+.info .wide-btn{margin-top:8px;margin-bottom:6px}
+.info .field-label{margin-top:6px}
+
+.field-label{display:block;color:var(--muted);font-size:13px;margin:0 0 9px 4px}
+.search-field{display:flex;align-items:center;gap:10px;background:var(--surface-2);
+  border-radius:15px;padding:13px 15px;margin-bottom:22px}
+.search-field svg{width:18px;height:18px;flex:none;color:var(--muted-2)}
+.search-field input,.search-field textarea{
+  flex:1;min-width:0;border:0;background:none;outline:none;font-size:15px}
+.search-field textarea{resize:none;line-height:1.5}
+.search-field:has(textarea){align-items:flex-start}
+.search-field input::-webkit-search-cancel-button{-webkit-appearance:none}
+.search-field input[type=number]::-webkit-outer-spin-button,
+.search-field input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+
+/* ── аркуші ─────────────────────────────────────────────────────────── */
+.sheet-wrap{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center}
+.sheet-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.65);
+  backdrop-filter:blur(3px);animation:fade .2s both}
+.sheet{
+  position:relative;width:100%;max-width:560px;max-height:88vh;
+  display:flex;flex-direction:column;
+  background:#0e0e10;border-radius:24px 24px 0 0;border-top:1px solid var(--line);
+  animation:rise .28s cubic-bezier(.24,.8,.3,1) both;
+}
+@keyframes rise{from{transform:translateY(100%)}to{transform:none}}
+.sheet-grip{width:38px;height:4px;border-radius:2px;background:var(--line);
+  margin:10px auto 2px;flex:none}
+.sheet-scroll{overflow-y:auto;padding:8px var(--pad) 18px;-webkit-overflow-scrolling:touch}
+.sheet h2{font-size:26px;font-weight:800;letter-spacing:-.02em;margin:6px 0 22px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:22px}
+.box{background:var(--surface-2);border-radius:15px;padding:9px 15px 11px}
+.box span{display:block;font-size:10px;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted-2);margin-bottom:1px}
+.box input{width:100%;border:0;background:none;font-size:17px;font-weight:600;outline:none}
+.box input::-webkit-outer-spin-button,.box input::-webkit-inner-spin-button{
+  -webkit-appearance:none;margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
+.chip{
+  padding:9px 15px;border-radius:999px;background:var(--surface-2);
+  color:var(--muted);font-size:14px;font-weight:600;
+  transition:background .15s,color .15s,transform .12s;
+}
+.chip:active{transform:scale(.95)}
+.chip.is-on{background:var(--accent-soft);color:#ff6b70;box-shadow:inset 0 0 0 1px rgba(245,35,43,.42)}
+.reset{display:block;width:100%;padding:14px;color:var(--muted);font-size:14px;font-weight:600}
+.sheet-cta{padding:10px var(--pad) calc(12px + var(--safe-b));
+  border-top:1px solid var(--line);background:#0e0e10}
+
+.lang-list{display:flex;flex-direction:column;gap:8px;padding-bottom:var(--safe-b)}
+.lang-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 17px;border-radius:15px;background:var(--surface);
+  font-size:16px;font-weight:600;transition:background .15s;
+}
+.lang-row.is-on{background:var(--accent-soft);color:#ff6b70;
+  box-shadow:inset 0 0 0 1px rgba(245,35,43,.42)}
+.lang-row i{font-style:normal;font-size:12px;font-weight:800;
+  letter-spacing:.06em;color:var(--muted-2)}
+.lang-row.is-on i{color:#ff6b70}
+
+/* ── плаваюча кнопка, таби, підказка ────────────────────────────────── */
+.fab{
+  position:fixed;right:var(--pad);z-index:40;
+  bottom:calc(var(--tabbar-h) + var(--safe-b) + 18px);
+  display:flex;align-items:center;gap:8px;
+  padding:14px 20px;border-radius:999px;
+  background:var(--accent);color:#fff;font-weight:700;font-size:15px;
+  box-shadow:0 12px 30px -8px var(--accent);
+  transition:transform .14s,opacity .2s;
+}
+.fab svg{width:18px;height:18px}
+.fab:active{transform:scale(.94)}
+.fab.is-hidden{opacity:0;transform:translateY(12px) scale(.9);pointer-events:none}
+
+.tabbar{
+  position:fixed;left:var(--pad);right:var(--pad);z-index:50;
+  bottom:calc(var(--safe-b) + 10px);height:var(--tabbar-h);
+  display:grid;grid-template-columns:repeat(4,1fr);align-items:center;
+  background:rgba(24,24,27,.82);backdrop-filter:blur(22px);
+  border:1px solid var(--line);border-radius:22px;
+}
+.tab{
+  position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;
+  color:var(--muted-2);font-size:11px;font-weight:600;transition:color .16s;
+}
+.tab svg{width:20px;height:20px}
+.tab.is-active{color:var(--accent)}
+.tab.is-active svg{fill:var(--accent-soft)}
+.badge{
+  position:absolute;top:-3px;right:calc(50% - 20px);
+  min-width:16px;height:16px;padding:0 4px;border-radius:8px;
+  background:var(--accent);color:#fff;font-size:10px;font-weight:700;
+  font-style:normal;display:grid;place-items:center;
+}
+
+/* Вибір кількох товарів для прибирання. Тільки для власника каталогу:
+   решта цих кнопок навіть не бачить. */
+.pick-btn{
+  position:absolute;left:10px;top:10px;width:32px;height:32px;padding:7px;
+  border-radius:50%;background:rgba(0,0,0,.6);backdrop-filter:blur(10px);
+  color:#fff;z-index:2;transition:transform .14s,background .16s;
+}
+.pick-btn:active{transform:scale(.85)}
+.pick-btn.is-on{background:var(--accent)}
+.card.is-picked .card-media{outline:2px solid var(--accent);outline-offset:-2px}
+.card.is-picked .card-media img{opacity:.45}
+.pick-bar{
+  position:fixed;left:var(--pad);right:var(--pad);z-index:55;
+  bottom:calc(var(--tabbar-h) + var(--safe-b) + 20px);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  max-width:560px;margin:0 auto;
+  padding:12px 16px;border-radius:18px;
+  background:rgba(24,24,27,.94);backdrop-filter:blur(22px);
+  border:1px solid var(--line);font-size:14px;font-weight:600;
+  animation:rise .2s ease both;
+}
+.pick-actions{display:flex;gap:14px;align-items:center}
+.pick-bar button{font-size:14px;font-weight:700;color:var(--muted)}
+.pick-bar .pick-go{color:var(--accent)}
+
+.toast{
+  position:fixed;left:50%;transform:translate(-50%,10px);z-index:70;
+  bottom:calc(var(--tabbar-h) + var(--safe-b) + 86px);
+  padding:10px 16px;border-radius:999px;font-size:13px;
+  background:rgba(30,30,34,.95);backdrop-filter:blur(10px);
+  opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
+}
+.toast.is-on{opacity:1;transform:translate(-50%,0)}
+
+/* ── планшет: дві колонки ───────────────────────────────────────────── */
+@media (min-width:640px){
+  :root{--pad:22px}
+  .feed{grid-template-columns:repeat(2,1fr);gap:28px 22px}
+  .brand-name{font-size:21px}
+}
+
+/* ── ноутбук: таби нагору, три колонки, товар у два стовпці ─────────── */
+@media (min-width:900px){
+  .screen{
+    padding-top:calc(var(--tabbar-h) + 22px);
+    padding-bottom:64px;
+  }
+  .detail{padding-top:0}
+  .tabbar{
+    top:14px;bottom:auto;left:50%;right:auto;
+    transform:translateX(-50%);width:min(520px,calc(100% - 2*var(--pad)));
+  }
+  .fab{bottom:28px}
+  .toast{bottom:104px}
+  .feed{grid-template-columns:repeat(3,1fr)}
+  .empty{padding:90px 34px}
+
+  .detail-shell{
+    display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);
+    gap:32px;padding:calc(var(--tabbar-h) + 22px) var(--pad) 48px;
+    align-items:start;
+  }
+  .gallery{border-radius:var(--r);aspect-ratio:4/3}
+  .back-btn,.detail-actions{top:12px}
+  .detail-body{padding:0}
+  .detail-body h1{font-size:28px}
+  .detail-price{font-size:34px}
+  .detail-cta{position:static;padding:8px 0 0;background:none}
+  .detail-cta .wide-btn{max-width:360px}
+  .detail-cta .ghost-btn{max-width:360px;text-align:left}
+}
+
+/* ── широкий екран: чотири колонки ──────────────────────────────────── */
+@media (min-width:1280px){
+  .feed{grid-template-columns:repeat(4,1fr)}
+}
+
+/* ── миша замість пальця: підсвічування при наведенні ───────────────── */
+@media (hover:hover){
+  .card{cursor:pointer}
+  .card:hover .card-media img{transform:scale(1.03)}
+  .card-media img{transition:opacity .35s ease,transform .35s ease}
+  .seg:hover,.chip:hover{background:var(--line)}
+  .seg.is-active:hover{background:var(--accent)}
+  .icon-btn:hover{background:var(--line)}
+  .wide-btn:hover{opacity:.92}
+  .lang-row:hover{background:var(--surface-2)}
+}
+
+/* ── людям, яким рух заважає ────────────────────────────────────────── */
+@media (prefers-reduced-motion:reduce){
+  *,*::after{animation:none!important;transition:none!important}
+}
